@@ -1,2 +1,18 @@
 server:
   port : 8080
+
+kafka:
+  group: group
+  topic:
+    init: init
+    init-dlq: init-dlq
+    customer: customer
+    customer-dlq: customer-dlq
+    payment: payment
+    payment-dlq: payment-dlq
+
+spring:
+  kafka:
+    consumer:
+      enable-auto-commit: false
+      auto-offset: earlisest

@@ -1,0 +1,27 @@
+package br.com.seda.celfons.core
+
+import br.com.seda.celfons.producer.ProducerService
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.kafka.annotation.KafkaListener
+import org.springframework.kafka.support.KafkaHeaders
+import org.springframework.messaging.handler.annotation.Header
+import org.springframework.messaging.handler.annotation.Payload
+import org.springframework.stereotype.Component
+
+@Component
+class InitTask(
+        private val producer: ProducerService,
+        @Value("\${kafka.topic.customer}") private val destinationTopic: String
+) : ITask {
+    @KafkaListener(topics = ["\${kafka.topic.init}", "\${kafka.topic.init-dlq}"], groupId = "\${kafka.group}")
+    override fun execute(@Header(KafkaHeaders.RECEIVED_TOPIC) originTopic: String, @Payload message: String) {
+        //TODO implements business rules
+        try {
+            producer.send(destinationTopic, message)
+            println("init")
+        } catch (e: Exception) {
+            producer.send("$originTopic-dlq", message)
+        }
+    }
+
+}
